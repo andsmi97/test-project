@@ -1,3 +1,5 @@
+const validator = require("../validators");
+const NodeCache = require("node-cache");
 const db = require("knex")({
   client: "mysql",
   connection: {
@@ -7,8 +9,10 @@ const db = require("knex")({
     database: "library"
   }
 });
-const NodeCache = require("node-cache");
-const myCache = new NodeCache();
+
+//1 hour ttl for cache
+const ttl = 60 * 60 * 1;
+const myCache = new NodeCache(ttl);
 
 /*
   request exapmle:
@@ -19,7 +23,7 @@ const myCache = new NodeCache();
     "description":"Рроман Льва Толстого о трагической любви замужней дамы Анны Карениной и блестящего офицера Вронского на фоне счастливой семейной жизни дворян Константина Лёвина и Кити Щербацкой. Масштабная картина нравов и быта дворянской среды Петербурга и Москвы второй половины XIX века",
     "date":"1873-01-01",
     "image":"http://lorempixel.com/200/400/"
-  }
+  } table
  
   response example:
   201 OK
@@ -27,10 +31,19 @@ const myCache = new NodeCache();
 const insert = async ctx => {
   try {
     // inserting fields into specified table
-
     const { table } = ctx.request.query;
     const { ...fields } = ctx.request.body;
-    await db(table).insert(fields);
+    //sanitize fields
+    const sanitizedFields = validator.sanitizeFields(fields);
+    //validating errors
+    const errors = validator.insertValidation(table, sanitizedFields);
+    if (errors === undefined || errors.length > 0) {
+      ctx.response.status = 400;
+      ctx.response.body = errors;
+      return;
+    }
+
+    await db(table).insert(sanitizedFields);
     ctx.response.status = 201;
   } catch (e) {
     //if error send 400 status and log error;
@@ -39,7 +52,7 @@ const insert = async ctx => {
   }
 };
 
-/* 
+/*
   request exapmle:
   url/update?id=1&table=books
   {
@@ -52,7 +65,7 @@ const insert = async ctx => {
 
   response example:
   204 OK
-*/
+ */
 const update = async ctx => {
   try {
     // updating specific record on table
@@ -60,9 +73,17 @@ const update = async ctx => {
     // it is NOT required to specify every column to update record
     const { ...fields } = ctx.request.body;
     const { id, table } = ctx.request.query;
+    const sanitizedFields = validator.sanitizeFields(fields);
+
+    const errors = validator.updateValidation(table, id, sanitizedFields);
+    if (errors === undefined || errors.length > 0) {
+      ctx.response.status = 400;
+      ctx.response.body = errors;
+      return;
+    }
     await db(table)
       .where({ id })
-      .update(fields);
+      .update(sanitizedFields);
     ctx.response.status = 200;
   } catch (e) {
     //if error send 400 status and log error;
@@ -92,30 +113,37 @@ const update = async ctx => {
 */
 const select = async ctx => {
   try {
-    const { limit, offset, order, filter } = ctx.request.query;
+    let { limit, offset, order, filter } = ctx.request.query;
+    //probably should sanitize since data is not going into db
+    //and escaping is done by default via knex
+    const errors = validator.selectValidation(limit, offset, order, filter);
+    if (errors === undefined || errors.length > 0) {
+      ctx.response.status = 400;
+      ctx.response.body = errors;
+      return;
+    }
 
     /*
-        had to specify select fields directly due to ambiguous id naming
-        this fields can be also parameterized if necessary
+      had to specify select fields directly due to ambiguous id naming
+      this fields can be also parameterized if necessary
 
-        from clause can be changed to table parameter if necessary
+      from clause can be changed to table parameter if necessary
 
-        filtration is simple json object with {field:value} notation
+      filtration is simple json object with {column:value} notation
 
-        order is simple json array with objects inside [{field, order}]
+      order is simple json array with objects inside [{column, order}]
 
-        limit and offset are integers
-        
-        more detail at https://knexjs.org/
-      */
-
+      limit and offset are integers
+      
+      more detail at https://knexjs.org/
+    */
     const cached = myCache.get(JSON.stringify(ctx.request.query));
     //if cached value exists return cache
     if (cached !== undefined) {
       ctx.response.body = cached;
     } else {
       //else make db reqest, cache it for 1 hour
-      const selected = await db
+      let sqlQuery = db
         .select([
           "books.id",
           "title",
@@ -127,13 +155,23 @@ const select = async ctx => {
           "last_name"
         ])
         .from("books")
-        .innerJoin("authors", "authors.id", "books.author_id")
-        .where(JSON.parse(filter))
-        .orderBy(JSON.parse(order))
-        .limit(Number(limit))
-        .offset(Number(offset));
+        .innerJoin("authors", "authors.id", "books.author_id");
+      //adding used params to sql query
+      if (filter) {
+        sqlQuery.where(JSON.parse(filter));
+      }
+      if (order) {
+        sqlQuery.orderBy(JSON.parse(order));
+      }
+      if (limit) {
+        sqlQuery.limit(Number(limit));
+      }
+      if (offset) {
+        sqlQuery.offset(Number(offset));
+      }
+      let selected = await sqlQuery;
       //cache key is query string so query order does matter
-      myCache.set(JSON.stringify(ctx.request.query), selected, 60 * 60 * 1);
+      myCache.set(JSON.stringify(ctx.request.query), selected);
       ctx.response.body = selected;
     }
   } catch (e) {

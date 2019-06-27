@@ -2,11 +2,13 @@ const db = require("knex")({
   client: "mysql",
   connection: {
     host: "mysql",
-    user: "myUser",
-    password: "myUser",
-    database: "mydb"
+    user: "root",
+    password: "myUserPass",
+    database: "library"
   }
 });
+const NodeCache = require("node-cache");
+const myCache = new NodeCache();
 
 /*
   request exapmle:
@@ -106,25 +108,34 @@ const select = async ctx => {
         
         more detail at https://knexjs.org/
       */
-    const selected = await db
-      .select([
-        "books.id",
-        "title",
-        "description",
-        "image",
-        "date",
-        "author_id",
-        "first_name",
-        "last_name"
-      ])
-      .from("books")
-      .innerJoin("authors", "authors.id", "books.author_id")
-      .where(JSON.parse(filter))
-      .orderBy(JSON.parse(order))
-      .limit(Number(limit))
-      .offset(Number(offset));
 
-    ctx.response.body = selected;
+    const cached = myCache.get(JSON.stringify(ctx.request.query));
+    //if cached value exists return cache
+    if (cached !== undefined) {
+      ctx.response.body = cached;
+    } else {
+      //else make db reqest, cache it for 1 hour
+      const selected = await db
+        .select([
+          "books.id",
+          "title",
+          "description",
+          "image",
+          "date",
+          "author_id",
+          "first_name",
+          "last_name"
+        ])
+        .from("books")
+        .innerJoin("authors", "authors.id", "books.author_id")
+        .where(JSON.parse(filter))
+        .orderBy(JSON.parse(order))
+        .limit(Number(limit))
+        .offset(Number(offset));
+      //cache key is query string so query order does matter
+      myCache.set(JSON.stringify(ctx.request.query), selected, 60 * 60 * 1);
+      ctx.response.body = selected;
+    }
   } catch (e) {
     //if error send 400 status and log error;
     console.error(e);

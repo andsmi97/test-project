@@ -1,5 +1,5 @@
 Arguments: 
-  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add node-cache
+  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add validator
 
 PATH: 
   C:\ProgramData\DockerDesktop\version-bin;C:\Program Files\Docker\Docker\Resources\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\Git\cmd;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\130\Tools\Binn\;C:\Program Files (x86)\Microsoft SQL Server\140\Tools\Binn\;C:\Program Files\Microsoft SQL Server\140\Tools\Binn\;C:\Program Files\Microsoft SQL Server\140\DTS\Binn\;C:\Program Files\nodejs\;C:\ProgramData\chocolatey\bin;C:\Program Files\dotnet\;D:\Programs\Matlab\runtime\win64;D:\Programs\Matlab\bin;D:\Programs\Matlab\polyspace\bin;C:\Program Files (x86)\Yarn\bin\;C:\Users\andsm\AppData\Local\Microsoft\WindowsApps;;C:\Users\andsm\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\andsm\AppData\Roaming\npm;C:\Users\andsm\AppData\Local\Programs\Microsoft VS Code Insiders\bin;C:\Users\andsm\AppData\Local\Yarn\bin
@@ -37,7 +37,8 @@ npm manifest:
       "koa-logger": "^3.2.0",
       "koa-onerror": "^4.1.0",
       "koa-router": "^7.4.0",
-      "mysql": "^2.17.1"
+      "mysql": "^2.17.1",
+      "node-cache": "^4.2.0"
     },
     "devDependencies": {
       "nodemon": "^1.19.1"
@@ -341,6 +342,11 @@ Lockfile:
     version "1.0.0"
     resolved "https://registry.yarnpkg.com/cli-boxes/-/cli-boxes-1.0.0.tgz#4fa917c3e59c94a004cd61f8ee509da651687143"
     integrity sha1-T6kXw+WclKAEzWH47lCdplFocUM=
+  
+  clone@2.x:
+    version "2.1.2"
+    resolved "https://registry.yarnpkg.com/clone/-/clone-2.1.2.tgz#1b7f4b9f591f1e8f83670401600345a02887435f"
+    integrity sha1-G39Ln1kfHo+DZwQBYANFoCiHQ18=
   
   co-body@^6.0.0:
     version "6.0.0"
@@ -1376,7 +1382,7 @@ Lockfile:
       rechoir "^0.6.2"
       resolve "^1.1.7"
   
-  lodash@^4.17.11:
+  lodash@4.x, lodash@^4.17.11:
     version "4.17.11"
     resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.11.tgz#b39ea6229ef607ecd89e2c8df12536891cac9b8d"
     integrity sha512-cQKh8igo5QUhZ7lg38DYWAxMvjSAKG0A8wGSVimP07SIUEK2UO+arSRKbRZWtelMtN5V0Hkwh5ryOto/SshYIg==
@@ -1563,6 +1569,14 @@ Lockfile:
     version "0.6.2"
     resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.2.tgz#feacf7ccf525a77ae9634436a64883ffeca346fb"
     integrity sha512-hZXc7K2e+PgeI1eDBe/10Ard4ekbfrrqG8Ep+8Jmf4JID2bNg7NvCPOZN+kfF574pFQI7mum2AUqDidoKqcTOw==
+  
+  node-cache@^4.2.0:
+    version "4.2.0"
+    resolved "https://registry.yarnpkg.com/node-cache/-/node-cache-4.2.0.tgz#48ac796a874e762582692004a376d26dfa875811"
+    integrity sha512-obRu6/f7S024ysheAjoYFEEBqqDWv4LOMNJEuO8vMeEw2AT4z+NCzO4hlc2lhI4vATzbCQv6kke9FVdx0RbCOw==
+    dependencies:
+      clone "2.x"
+      lodash "4.x"
   
   node-pre-gyp@^0.12.0:
     version "0.12.0"

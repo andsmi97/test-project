@@ -1,0 +1,701 @@
+{
+	"info": {
+		"_postman_id": "eacf4a2c-cfd1-4f5f-9697-7bc40669dec8",
+		"name": "testproject testing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Correct insertion",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "522bc746-c75a-43ee-bb6e-e3da8eecd69d",
+						"exec": [
+							"const is201Response = responseCode.code === 201;",
+							"",
+							"tests['Response code is 201 CREATED'] = is201Response;",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"  Война и мир\",\r\n    \"author_id\": 1,\r\n    \"description\":\"  Роман-эпопея Льва Николаевича Толстого, описывающий русское общество в эпоху войн против Наполеона в 1805—1812 годах.\",\r\n    \"date\":\"1965-01-01\",\r\n    \"image\":\"http://lorempixel.com/200/400/\"\r\n  }"
+				},
+				"url": {
+					"raw": "localhost:3000/insert?table=books",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"insert"
+					],
+					"query": [
+						{
+							"key": "table",
+							"value": "books"
+						}
+					]
+				},
+				"description": "fields test"
+			},
+			"response": []
+		},
+		{
+			"name": "table error",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "40d784fd-de84-4e7b-908d-85bd7e5d5d92",
+						"exec": [
+							"const is400Response = responseCode.code === 400;",
+							"",
+							"tests['Response code is 400 Bad Request'] = is400Response;",
+							"",
+							"",
+							"if(is400Response){",
+							"    const responseJSON = JSON.parse(responseBody);",
+							"    tests['Response is array'] = Array.isArray(responseJSON);",
+							"    const error = responseJSON;",
+							"    const typeIsInArray = (array, type) => array.filter(value=>value.type === type).length === 1;  ",
+							"    tests['Error has table error'] = typeIsInArray(error,'table error');",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"  Война и мир\",\r\n    \"author_id\": 1,\r\n    \"description\":\"  Роман-эпопея Льва Николаевича Толстого, описывающий русское общество в эпоху войн против Наполеона в 1805—1812 годах.\",\r\n    \"date\":\"1965-01-01\",\r\n    \"image\":\"http://lorempixel.com/200/400/\"\r\n  }"
+				},
+				"url": {
+					"raw": "localhost:3000/insert",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"insert"
+					]
+				},
+				"description": "fields test"
+			},
+			"response": []
+		},
+		{
+			"name": "books fields error",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b9c02107-8e5c-491b-91fd-542f55af9f7c",
+						"exec": [
+							"const is400Response = responseCode.code === 400;",
+							"",
+							"tests['Response code is 400 Bad Request'] = is400Response;",
+							"",
+							"",
+							"if(is400Response){",
+							"    const responseJSON = JSON.parse(responseBody);",
+							"    tests['Response is array'] = Array.isArray(responseJSON);",
+							"    const error = responseJSON;",
+							"    const typeIsInArray = (array, type) =>array.filter(value=>value.type === type).length === 1;  ",
+							"    tests['Error has title error'] = typeIsInArray(error,'title error');",
+							"    tests['Error has author_id error'] = typeIsInArray(error,'author_id error'); ",
+							"    tests['Error has description error'] = typeIsInArray(error,'description error'); ",
+							"    tests['Error has image error'] = typeIsInArray(error,'image error'); ",
+							"    tests['Error has date error'] = typeIsInArray(error, 'date error');",
+							"    tests['Error has field error'] = typeIsInArray(error,'bookcolumns error');",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"a\":\"test\"}"
+				},
+				"url": {
+					"raw": "localhost:3000/insert?table=books",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"insert"
+					],
+					"query": [
+						{
+							"key": "table",
+							"value": "books"
+						}
+					]
+				},
+				"description": "testing body"
+			},
+			"response": []
+		},
+		{
+			"name": "authors fields error Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b9c02107-8e5c-491b-91fd-542f55af9f7c",
+						"exec": [
+							"const is400Response = responseCode.code === 400;",
+							"",
+							"tests['Response code is 400 Bad Request'] = is400Response;",
+							"",
+							"",
+							"if(is400Response){",
+							"    const responseJSON = JSON.parse(responseBody);",
+							"    tests['Response is array'] = Array.isArray(responseJSON);",
+							"    const error = responseJSON;",
+							"    const typeIsInArray = (array, type) =>array.filter(value=>value.type === type).length === 1;  ",
+							"    tests['Error has first_name error'] = typeIsInArray(error,'first_name error');",
+							"    tests['Error has last_name error'] = typeIsInArray(error,'last_name error'); ",
+							"    tests['Error has field error'] = typeIsInArray(error,'authorcolumns error');",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"a\":\"test\"}"
+				},
+				"url": {
+					"raw": "localhost:3000/insert?table=authors",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"insert"
+					],
+					"query": [
+						{
+							"key": "table",
+							"value": "authors"
+						}
+					]
+				},
+				"description": "testing body"
+			},
+			"response": []
+		},
+		{
+			"name": "valid select",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "58d6596d-5f5e-43f3-9c14-e8a23ebe0bf9",
+						"exec": [
+							"const is200Response = responseCode.code === 200;",
+							"",
+							"tests['Response code is 200 OK'] = is200Response;",
+							"",
+							"if(is200Response){",
+							"    const responseJSON = JSON.parse(responseBody);",
+							"    tests['Response is array'] = Array.isArray(responseJSON);",
+							"    const records = responseJSON;",
+							"    tests['record has id field'] = records[0].hasOwnProperty('id');",
+							"    tests['record has title field'] = records[0].hasOwnProperty('title');",
+							"    tests['record has description field'] = records[0].hasOwnProperty('description');",
+							"    tests['record has image field'] = records[0].hasOwnProperty('image');",
+							"    tests['record has date field'] = records[0].hasOwnProperty('date');",
+							"    tests['record has author_id field'] = records[0].hasOwnProperty('author_id');",
+							"    tests['record has first_name field'] = records[0].hasOwnProperty('first_name');",
+							"    tests['record has last_name field'] = records[0].hasOwnProperty('last_name');",
+							"    tests['there are 10 records'] = records.length === 10;",
+							"    tests['filter works correctly'] = records[0].image === 'http://lorempixel.com/200/400/';",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/select?offset=10&limit=10&order=[{\"column\":\"id\", \"order\":\"desc\"}]&filter={\"image\":\"http://lorempixel.com/200/400/\"}",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"select"
+					],
+					"query": [
+						{
+							"key": "offset",
+							"value": "10"
+						},
+						{
+							"key": "limit",
+							"value": "10"
+						},
+						{
+							"key": "order",
+							"value": "[{\"column\":\"id\", \"order\":\"desc\"}]"
+						},
+						{
+							"key": "filter",
+							"value": "{\"image\":\"http://lorempixel.com/200/400/\"}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "valid select withlimit and offset",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "22c36998-033f-4a82-9079-cd64f71ae964",
+						"exec": [
+							"const is200Response = responseCode.code === 200;",
+							"",
+							"tests['Response code is 200 OK'] = is200Response;",
+							"",
+							"if(is200Response){",
+							"    const responseJSON = JSON.parse(responseBody);",
+							"    tests['Response is array'] = Array.isArray(responseJSON);",
+							"    const records = responseJSON;",
+							"    tests['record has id field'] = records[0].hasOwnProperty('id');",
+							"    tests['record has title field'] = records[0].hasOwnProperty('title');",
+							"    tests['record has description field'] = records[0].hasOwnProperty('description');",
+							"    tests['record has image field'] = records[0].hasOwnProperty('image');",
+							"    tests['record has date field'] = records[0].hasOwnProperty('date');",
+							"    tests['record has author_id field'] = records[0].hasOwnProperty('author_id');",
+							"    tests['record has first_name field'] = records[0].hasOwnProperty('first_name');",
+							"    tests['record has last_name field'] = records[0].hasOwnProperty('last_name');",
+							"    tests['there are 10 records'] = records.length === 10;",
+							"    tests['id should start from 11'] = records[0].id === 11",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/select?offset=10&limit=10",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"select"
+					],
+					"query": [
+						{
+							"key": "offset",
+							"value": "10"
+						},
+						{
+							"key": "limit",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "invalid select",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d0572016-d87b-4262-98ee-abc584a5988c",
+						"exec": [
+							"const is400Response = responseCode.code === 400;",
+							"",
+							"tests['Response code is 400 Bad Request'] = is400Response;",
+							"",
+							"",
+							"if(is400Response){",
+							"    const responseJSON = JSON.parse(responseBody);",
+							"    tests['Response is array'] = Array.isArray(responseJSON);",
+							"    const error = responseJSON;",
+							"    const typeIsInArray = (array, type) =>array.filter(value=>value.type === type).length === 1;  ",
+							"    tests['Error has limit error'] = typeIsInArray(error,'limit error');",
+							"    tests['Error has offset error'] = typeIsInArray(error,'offset error'); ",
+							"    tests['Error has order error'] = typeIsInArray(error,'order error'); ",
+							"    tests['Error has filter error'] = typeIsInArray(error,'filter error'); ",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/select?offset=a&limit=a&order={\"column\":\"id\", \"order\":\"desc\"}]&filter=\"image\":\"http://lorempixel.com/200/400/\"}",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"select"
+					],
+					"query": [
+						{
+							"key": "offset",
+							"value": "a"
+						},
+						{
+							"key": "limit",
+							"value": "a"
+						},
+						{
+							"key": "order",
+							"value": "{\"column\":\"id\", \"order\":\"desc\"}]"
+						},
+						{
+							"key": "filter",
+							"value": "\"image\":\"http://lorempixel.com/200/400/\"}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "valid author update",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": " {\r\n    \"first_name\":\"Лев\",\r\n    \"last_name\":\"Толстой\"\r\n  }"
+				},
+				"url": {
+					"raw": "localhost:3000/update?id=1&table=authors",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"update"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1"
+						},
+						{
+							"key": "table",
+							"value": "authors"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "valid book update",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3021d60c-be36-453b-b2fc-82db38258ec8",
+						"exec": [
+							"const is200Response = responseCode.code === 200;",
+							"",
+							"tests['Response code is 200 OK'] = is200Response;",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"  Война и мир\",\r\n    \"author_id\": 1,\r\n    \"description\":\"  Роман-эпопея Льва Николаевича Толстого, описывающий русское общество в эпоху войн против Наполеона в 1805—1812 годах.\",\r\n    \"date\":\"1965-01-01\",\r\n    \"image\":\"http://lorempixel.com/200/400/\"\r\n }"
+				},
+				"url": {
+					"raw": "localhost:3000/update?id=1&table=books",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"update"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1"
+						},
+						{
+							"key": "table",
+							"value": "books"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update table error",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b5c48b96-8510-4f85-bbf4-1451f14dd7cf",
+						"exec": [
+							"const is400Response = responseCode.code === 400;",
+							"",
+							"tests['Response code is 400 Bad Request'] = is400Response;",
+							"",
+							"",
+							"if(is400Response){",
+							"    const responseJSON = JSON.parse(responseBody);",
+							"    tests['Response is array'] = Array.isArray(responseJSON);",
+							"    const errors = responseJSON;",
+							"    const typeIsInArray = (array, type) => array.filter(value=>value.type === type).length === 1;  ",
+							"    tests['Errors has table error'] = typeIsInArray(errors,'table error');",
+							"",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": " {\r\n    \"first_name\":\"Лев\",\r\n    \"last_name\":\"Толстой\"\r\n }"
+				},
+				"url": {
+					"raw": "localhost:3000/update?id=1",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"update"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update book fields errors",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b5c48b96-8510-4f85-bbf4-1451f14dd7cf",
+						"exec": [
+							"const is400Response = responseCode.code === 400;",
+							"",
+							"tests['Response code is 400 Bad Request'] = is400Response;",
+							"",
+							"",
+							"if(is400Response){",
+							"    const responseJSON = JSON.parse(responseBody);",
+							"    tests['Response is array'] = Array.isArray(responseJSON);",
+							"    const error = responseJSON;",
+							"    const typeIsInArray = (array, type) =>array.filter(value=>value.type === type).length === 1;  ",
+							"    tests['Error has title error'] = typeIsInArray(error,'title error');",
+							"    tests['Error has author_id error'] = typeIsInArray(error,'author_id error'); ",
+							"    tests['Error has description error'] = typeIsInArray(error,'description error'); ",
+							"    tests['Error has image error'] = typeIsInArray(error,'image error'); ",
+							"    tests['Error has date error'] = typeIsInArray(error, 'date error');",
+							"    tests['Error has id error'] = typeIsInArray(error, 'ID error');",
+							"    tests['Error has field error'] = typeIsInArray(error,'bookcolumns error');",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"\",\r\n    \"author_id\": 0,\r\n    \"description\":\"\",\r\n    \"date\":\"\",\r\n    \"image\":\"\",\r\n    \"a\":\"test\"\r\n  }"
+				},
+				"url": {
+					"raw": "localhost:3000/update?table=books",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"update"
+					],
+					"query": [
+						{
+							"key": "table",
+							"value": "books"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update author fields errors",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b5c48b96-8510-4f85-bbf4-1451f14dd7cf",
+						"exec": [
+							"const is400Response = responseCode.code === 400;",
+							"",
+							"tests['Response code is 400 Bad Request'] = is400Response;",
+							"",
+							"",
+							"if(is400Response){",
+							"    const responseJSON = JSON.parse(responseBody);",
+							"    tests['Response is array'] = Array.isArray(responseJSON);",
+							"    const error = responseJSON;",
+							"    const typeIsInArray = (array, type) =>array.filter(value=>value.type === type).length === 1;  ",
+							"    tests['Error has first_name error'] = typeIsInArray(error,'first_name error');",
+							"    tests['Error has last_name error'] = typeIsInArray(error,'last_name error'); ",
+							"    tests['Error has id error'] = typeIsInArray(error, 'ID error');",
+							"    tests['Error has field error'] = typeIsInArray(error,'authorcolumns error');",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\": \"\",\r\n    \"last_name\": \"\",\r\n    \"extra_field\":\"test\"\r\n  }"
+				},
+				"url": {
+					"raw": "localhost:3000/update?table=authors",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"update"
+					],
+					"query": [
+						{
+							"key": "table",
+							"value": "authors"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

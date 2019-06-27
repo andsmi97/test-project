@@ -1,30 +1,49 @@
-/* 
+const db = require("knex")({
+  client: "mysql",
+  connection: {
+    host: "mysql",
+    user: "myUser",
+    password: "myUser",
+    database: "mydb"
+  }
+});
+
+/*
   request exapmle:
-  url/insert
+  url/insert?table=books
   {
-    "title": "Война и мир",
-    "author": 1,
-    "description":"Роман-эпопея Льва Николаевича Толстого, описывающий русское общество в эпоху войн против Наполеона в 1805—1812 годах."
-    "date":"1965-01-01",
+    "title": "Анна Каренина",
+    "author_id": 1,
+    "description":"Рроман Льва Толстого о трагической любви замужней дамы Анны Карениной и блестящего офицера Вронского на фоне счастливой семейной жизни дворян Константина Лёвина и Кити Щербацкой. Масштабная картина нравов и быта дворянской среды Петербурга и Москвы второй половины XIX века",
+    "date":"1873-01-01",
     "image":"http://lorempixel.com/200/400/"
   }
-
+ 
   response example:
   201 OK
-*/
+ */
 const insert = async ctx => {
-  const { title, author, description, date, image } = ctx.request.body;
+  try {
+    // inserting fields into specified table
 
-  ctx.response.status = 201;
+    const { table } = ctx.request.query;
+    const { ...fields } = ctx.request.body;
+    await db(table).insert(fields);
+    ctx.response.status = 201;
+  } catch (e) {
+    //if error send 400 status and log error;
+    console.error(e);
+    ctx.response.status = 400;
+  }
 };
 
 /* 
   request exapmle:
-  url/update?id=1
+  url/update?id=1&table=books
   {
     "title": "Война и мир",
     "author": 1,
-    "description":"Роман-эпопея Льва Николаевича Толстого, описывающий русское общество в эпоху войн против Наполеона в 1805—1812 годах."
+    "description":"Роман-эпопея Льва Николаевича Толстого, описывающий русское общество в эпоху войн против Наполеона в 1805—1812 годах.",
     "date":"1965-01-01",
     "image":"http://lorempixel.com/200/400/"
   }
@@ -33,42 +52,84 @@ const insert = async ctx => {
   204 OK
 */
 const update = async ctx => {
-  const { title, author, description, date, image } = ctx.request.body;
-  const { id } = ctx.request.query;
-  ctx.response.status = 201;
+  try {
+    // updating specific record on table
+    // fields is an object where keys are the column names
+    // it is NOT required to specify every column to update record
+    const { ...fields } = ctx.request.body;
+    const { id, table } = ctx.request.query;
+    await db(table)
+      .where({ id })
+      .update(fields);
+    ctx.response.status = 200;
+  } catch (e) {
+    //if error send 400 status and log error;
+    console.error(e);
+    ctx.response.status = 400;
+  }
 };
 
 /*
   reqest example:
-  url/select?limit=11&offset=0&order=title&sort=asc&author=1
+  url/select?limit=1&offset=10&order=[{"column":"id", "order":"desc"}]&filter={"image":"http://lorempixel.com/200/400/"}
 
   reponse example
   200
   [
-    {
-      "id": 1,
-      "title": "Война и мир",
-      "author": 1,
-      "description":"Роман-эпопея Льва Николаевича Толстого, описывающий русское общество в эпоху войн против Наполеона в 1805—1812 годах."
-      "date":"1965-01-01",
-      "image":"http://lorempixel.com/200/400/"
-    }
+      {
+          "id": 99990,
+          "title": "Veniam exercitationem maxime quia quia iste.",
+          "description": "Laudantium veniam quisquam et fuga. Aut est qui et eveniet dolorem quod distinctio. Vitae beatae id vel vero quod animi labore.",
+          "image": "http://lorempixel.com/200/400/",
+          "date": "2003-01-03T00:00:00.000Z",
+          "author_id": 99990,
+          "first_name": "Vivian",
+          "last_name": "Tillman"
+      }
   ]
 */
 const select = async ctx => {
-  const {
-    limit,
-    offset,
-    order,
-    sort,
-    title,
-    author,
-    description,
-    date,
-    image
-  } = ctx.request.query;
+  try {
+    const { limit, offset, order, filter } = ctx.request.query;
 
-  ctx.response.status = 200;
+    /*
+        had to specify select fields directly due to ambiguous id naming
+        this fields can be also parameterized if necessary
+
+        from clause can be changed to table parameter if necessary
+
+        filtration is simple json object with {field:value} notation
+
+        order is simple json array with objects inside [{field, order}]
+
+        limit and offset are integers
+        
+        more detail at https://knexjs.org/
+      */
+    const selected = await db
+      .select([
+        "books.id",
+        "title",
+        "description",
+        "image",
+        "date",
+        "author_id",
+        "first_name",
+        "last_name"
+      ])
+      .from("books")
+      .innerJoin("authors", "authors.id", "books.author_id")
+      .where(JSON.parse(filter))
+      .orderBy(JSON.parse(order))
+      .limit(Number(limit))
+      .offset(Number(offset));
+
+    ctx.response.body = selected;
+  } catch (e) {
+    //if error send 400 status and log error;
+    console.error(e);
+    ctx.response.status = 400;
+  }
 };
 
 module.exports = {

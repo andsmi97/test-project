@@ -12,7 +12,7 @@
     "debug": "^4.1.1",
     "dompurify": "^1.0.11",
     "jsdom": "^15.1.1",
-    "knex": "^0.18.0",
+    "knex": "^0.19.5",
     "koa": "^2.7.0",
     "koa-bodyparser": "^4.2.1",
     "koa-convert": "^1.2.0",
